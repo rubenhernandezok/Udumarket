@@ -1,73 +1,144 @@
+import { useState } from "react";
+import { createSale } from "../services/saleService";
+
+
 /*
 PaymentPanel
-
-Muestra total de la venta
-y permite cobrar.
+- Efectivo: muestra inline el campo de monto recibido y cambio,
+  y llama al backend con method "cash".
+- Transferencia: llama directamente al backend con method "transfer".
+No existe pantalla adicional.
 */
-import { createSale } from "../../pos/services/saleService";
 
+export default function PaymentPanel({ cart, total, setCart, clearCart }) {
+  const [method, setMethod] = useState(null); // null | "cash" | "transfer"
+  const [received, setReceived] = useState("");
+  const [loading, setLoading] = useState(false);
 
-export default function PaymentPanel({ cart, total, setCart }) {
+  const change =
+    received !== "" ? parseFloat(received) - total : null;
 
-const handlePayment = async (method) => {
+  const handleSelectMethod = (m) => {
+    if (m === "transfer") {
+      handlePayment("transfer");
+      return;
+    }
+    setMethod("cash");
+    setReceived("");
+  };
 
-  if (cart.length === 0) {
-    alert("No hay productos en la venta")
-    return
-  }
-
-  try {
-
-    const response = await createSale(cart, method)
-
-    if (response.sale_id) {
-
-      alert("Venta registrada correctamente")
-
-      setCart([])
-
-    } else {
-
-      alert(response.error || "Error al registrar venta")
-
+  const handlePayment = async (m) => {
+    if (cart.length === 0) {
+      alert("No hay productos en la venta");
+      return;
     }
 
-  } catch (error) {
+    if (m === "cash") {
+      const recv = parseFloat(received);
+      if (isNaN(recv) || recv < total) {
+        alert("El efectivo recibido es insuficiente");
+        return;
+      }
+    }
 
-    console.error(error)
+    setLoading(true);
+    try {
+      const response = await createSale(cart, m);
+      if (response.sale_id) {
 
-    alert("Error de conexión")
+  alert("Venta registrada correctamente");
 
+  setCart([]);
+
+  setMethod(null);
+
+  setReceived("");
+
+  if (clearCart) {
+    clearCart();
   }
 
-
-
-};
+      } else {
+        alert(response.error || "Error al registrar venta");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error de conexión");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
+    <div className="pos-payment">
+      {/* ── Botones de método de pago ── */}
+      <div className="pos-payment-footer">
+        <button
+          className={`pos-btn-pay pos-btn-cash${method === "cash" ? " active" : ""}`}
+          onClick={() => handleSelectMethod("cash")}
+          disabled={loading}
+        >
+          💵 Efectivo
+        </button>
+        <button
+          className="pos-btn-pay pos-btn-transfer"
+          onClick={() => handleSelectMethod("transfer")}
+          disabled={loading}
+        >
+          🏦 Transferencia
+        </button>
+      </div>
 
-    <div className="card p-3">
+      {/* ── Panel de efectivo inline (sin nueva pantalla) ── */}
+      {method === "cash" && (
+        <div className="pos-cash-panel">
+          <div className="pos-cash-row">
+            {/* Efectivo recibido */}
+            <div className="pos-cash-field">
+              <label className="pos-cash-label">Efectivo recibido</label>
+              <div className="pos-cash-input-wrap">
+                <span className="pos-cash-symbol">$</span>
+                <input
+                  type="number"
+                  className="pos-cash-input"
+                  placeholder="0.00"
+                  value={received}
+                  onChange={(e) => setReceived(e.target.value)}
+                  autoFocus
+                />
+              </div>
+            </div>
 
-      <h5>Total</h5>
+            {/* Cambio */}
+            <div className="pos-cash-field">
+              <label className="pos-cash-label">Cambio</label>
+              <div className={`pos-change-display${change !== null && change < 0 ? " negative" : ""}`}>
+                <span className="pos-cash-symbol">$</span>
+                <span className="pos-change-value">
+                  {change !== null
+                    ? `${change < 0 ? "-" : ""}${Math.abs(change).toFixed(2)}`
+                    : "——"}
+                </span>
+              </div>
+            </div>
 
-      <h3>${total}</h3>
+            {/* Total */}
+            <div className="pos-cash-field">
+              <label className="pos-cash-label">Total</label>
+              <div className="pos-total-badge">${total.toFixed(2)}</div>
+            </div>
 
-      <button
-        className="btn btn-success w-100 mb-2"
-        onClick={() => handlePayment("cash")}
-      >
-        Cobrar efectivo
-      </button>
-
-      <button
-        className="btn btn-primary w-100"
-        onClick={() => handlePayment("transfer")}
-      >
-        Transferencia
-      </button>
-
+            {/* Aceptar */}
+            <button
+              className="pos-btn-accept"
+              onClick={() => handlePayment("cash")}
+              disabled={loading || change === null || change < 0}
+            >
+              {loading ? "..." : "✔ Aceptar"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
-
   );
-
 }

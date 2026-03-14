@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import Layout from "../../../components/layout/Layout"
 
 import StatsCards from "../components/StatsCards"
+import TopProducts from "../components/TopProducts"
+import LowStockProducts from "../components/LowStockProducts"
 import { getDashboardStats } from "../services/dashboardService"
 
 export default function Dashboard() {
@@ -47,6 +49,10 @@ export default function Dashboard() {
         <h2 className="mb-4">Dashboard</h2>
 
         {stats && <StatsCards stats={stats} />}
+
+        <TopProducts products={stats.top_products || []} />
+
+        <LowStockProducts products={stats.low_stock || []} />
 
       </div>
 

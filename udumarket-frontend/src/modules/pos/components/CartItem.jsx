@@ -1,53 +1,78 @@
-/*
-CartItem
-
-Representa un producto dentro del carrito.
-*/
-
-export default function CartItem({ item, increaseQuantity, decreaseQuantity }) {
+export default function CartItem({
+  item,
+  increaseQuantity,
+  decreaseQuantity,
+  updateQuantity,
+  onRemove
+}) {
 
   return (
+    <tr className="pos-cart-row">
 
-    <div className="d-flex justify-content-between align-items-center border-bottom py-2">
+      <td className="pos-td pos-td-id">
+        {item.barcode}
+      </td>
 
-      <div>
+      <td className="pos-td pos-td-name">
+        {item.name}
+      </td>
 
-        <strong>{item.name}</strong>
+      <td className="pos-td pos-td-price">
+        ${Number(item.price).toFixed(2)}
+      </td>
 
-        <br />
+      <td className="pos-td pos-td-qty">
 
-        <small>
-          ${item.price} x {item.quantity}
-        </small>
+        <div className="pos-qty-cell">
 
-      </div>
+          <button
+            className="pos-qty-btn"
+            onClick={() => decreaseQuantity(item.product_id)}
+          >
+            −
+          </button>
 
-      <div>
+          <input
+  type="number"
+  step="0.01"
+  min="0"
+  value={item.quantity}
+  className="pos-qty-input"
+  onChange={(e) =>
+    updateQuantity(
+      item.product_id,
+      e.target.value
+    )
+  }
+/>
+
+
+          <button
+            className="pos-qty-btn"
+            onClick={() => increaseQuantity(item.product_id)}
+          >
+            +
+          </button>
+
+        </div>
+
+      </td>
+
+      <td className="pos-td pos-td-subtotal">
+        ${Number(item.subtotal).toFixed(2)}
+      </td>
+
+      <td className="pos-td pos-td-action">
 
         <button
-          className="btn btn-sm btn-secondary me-2"
-          onClick={() => decreaseQuantity(item.product_id)}
+          className="pos-btn-remove"
+          onClick={() => onRemove(item.product_id)}
         >
-          -
+          ✕
         </button>
 
-        <button
-          className="btn btn-sm btn-secondary"
-          onClick={() => increaseQuantity(item.product_id)}
-        >
-          +
-        </button>
+      </td>
 
-      </div>
-
-      <div>
-
-        <strong>${item.subtotal}</strong>
-
-      </div>
-
-    </div>
-
+    </tr>
   );
-
 }

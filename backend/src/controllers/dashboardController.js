@@ -43,11 +43,62 @@ export const getDashboard = async (req, res) => {
       0
     )
 
-    res.json({
-      today_sales: today_total,
-      month_sales: month_total,
-      sales_count_today: (todaySales || []).length
+    // 🔥 TOP PRODUCTOS VENDIDOS
+    const { data: topProducts, error: topError } = await supabase
+      .from("sale_items")
+      .select(`
+        quantity,
+        products (
+          name,
+          business_id
+        )
+      `)
+
+    if (topError) throw topError
+
+    // ⚠️ PRODUCTOS CON STOCK BAJO
+const { data: products, error: productsError } = await supabase
+  .from("products")
+  .select("name, stock, stock_min")
+  .eq("business_id", business_id)
+
+if (productsError) throw productsError
+
+const lowStock = (products || [])
+  .filter(p => p.stock <= p.stock_min)
+  .sort((a, b) => a.stock - b.stock)
+  .slice(0, 5)
+
+    // agrupar productos
+    const productMap = {}
+
+    ;(topProducts || []).forEach(item => {
+
+      // ignorar productos de otros negocios
+      if (item.products?.business_id !== business_id) return
+
+      const name = item.products?.name || "Producto"
+
+      if (!productMap[name]) {
+        productMap[name] = 0
+      }
+
+      productMap[name] += Number(item.quantity)
+
     })
+
+    const sortedProducts = Object.entries(productMap)
+      .map(([name, qty]) => ({ name, qty }))
+      .sort((a, b) => b.qty - a.qty)
+      .slice(0, 5)
+
+   res.json({
+  today_sales: today_total,
+  month_sales: month_total,
+  sales_count_today: (todaySales || []).length,
+  top_products: sortedProducts,
+  low_stock: lowStock
+})
 
   } catch (error) {
 

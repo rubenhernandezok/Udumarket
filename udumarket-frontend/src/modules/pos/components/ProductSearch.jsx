@@ -1,29 +1,31 @@
-import { useState } from "react";
+import React from "react";
 
-export default function ProductSearch({ onSearch }) {
+export default function ProductSearch({ query, onSearch, onClearCart }) {
 
-  const [query, setQuery] = useState("");
-
-  const handleSearch = (e) => {
-
-    const value = e.target.value;
-
-    setQuery(value);
-
-    onSearch(value); // ahora llama al POS
-
+  const handleChange = (e) => {
+    onSearch(e.target.value);
   };
 
   return (
+    <div className="pos-search-row">
 
-    <input
-      type="text"
-      className="form-control"
-      placeholder="Buscar producto..."
-      value={query}
-      onChange={handleSearch}
-    />
+      <div className="pos-search-wrap">
+        <input
+          type="text"
+          className="pos-search-input"
+          placeholder="Buscar producto o escanear código..."
+          value={query}
+          onChange={handleChange}
+        />
+      </div>
 
+      <button
+        className="pos-btn-clear"
+        onClick={onClearCart}
+      >
+        Limpiar
+      </button>
+
+    </div>
   );
-
 }

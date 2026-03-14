@@ -1,0 +1,614 @@
+/* ============================================================
+   POS.css  —  Módulo de Ventas
+   Usa los tokens de theme.css: --bg-*, --accent, --success,
+   --warning, --danger, --text-*, --border, --input-*
+   Funciona automáticamente en dark y light mode.
+   NO importa fuentes externas.
+   ============================================================ */
+
+/* ── Layout raíz ── */
+.pos-page {
+  display: flex;
+  gap: 24px;
+  padding: 24px 28px;
+  min-height: calc(100vh - 56px);
+  background: var(--bg-app);
+  font-family: inherit;
+  color: var(--text-primary);
+  box-sizing: border-box;
+  transition: background 0.25s;
+}
+
+/* ── Columnas ── */
+.pos-left {
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.pos-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+
+/* ── Título de sección ── */
+.pos-section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  transition: color 0.25s;
+}
+
+.pos-title-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  flex-shrink: 0;
+  transition: background 0.25s, border-color 0.25s;
+}
+
+.pos-title-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Búsqueda ── */
+.pos-search-block {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.pos-search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pos-search-wrap {
+  position: relative;
+  flex: 1;
+}
+
+.pos-search-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.pos-search-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.pos-search-input {
+  width: 100%;
+  padding: 9px 12px 9px 34px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--text-primary);
+  background: var(--input-bg);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.25s, color 0.25s;
+}
+
+.pos-search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.pos-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.pos-btn-clear {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 12px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+
+.pos-btn-clear:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+/* ── Dropdown de resultados ── */
+.pos-results-dropdown {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  z-index: 100;
+  overflow: hidden;
+  animation: pos-fade-in 0.15s ease;
+  transition: background 0.25s, border-color 0.25s;
+}
+
+@keyframes pos-fade-in {
+  from { opacity: 0; transform: translateY(-5px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.pos-result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+}
+
+.pos-result-item:last-child {
+  border-bottom: none;
+}
+
+.pos-result-item:hover {
+  background: var(--bg-hover);
+}
+
+.pos-result-name {
+  font-size: 13.5px;
+  color: var(--text-primary);
+  font-weight: 500;
+  transition: color 0.25s;
+}
+
+.pos-result-price {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* ── Tabla del carrito ── */
+.pos-cart-wrap {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: background 0.25s, border-color 0.25s;
+}
+
+.pos-cart-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.pos-cart-thead {
+  background: var(--accent);
+}
+
+.pos-th {
+  padding: 11px 14px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pos-cart-row {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+  animation: pos-row-in 0.18s ease;
+}
+
+@keyframes pos-row-in {
+  from { opacity: 0; transform: translateY(-3px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.pos-cart-row:last-child {
+  border-bottom: none;
+}
+
+.pos-cart-row:hover {
+  background: var(--bg-hover);
+}
+
+.pos-td {
+  padding: 10px 14px;
+  vertical-align: middle;
+  color: var(--text-secondary);
+  transition: color 0.25s;
+}
+
+.pos-td-id {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.pos-td-name {
+  max-width: 180px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.pos-td-subtotal {
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.pos-cart-empty {
+  text-align: center;
+  padding: 32px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* ── Controles de cantidad ── */
+.pos-qty-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pos-qty-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  transition: all 0.14s;
+}
+
+.pos-qty-minus {
+  background: var(--bg-hover);
+  color: var(--danger);
+  border: 1px solid var(--border);
+}
+
+.pos-qty-minus:hover {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+}
+
+.pos-qty-plus {
+  background: var(--bg-hover);
+  color: var(--accent);
+  border: 1px solid var(--border);
+}
+
+.pos-qty-plus:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.pos-qty-display {
+  min-width: 30px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 13.5px;
+  color: var(--text-primary);
+  background: var(--bg-hover);
+  border-radius: 6px;
+  padding: 2px 7px;
+  border: 1px solid var(--border);
+  transition: background 0.25s, color 0.25s;
+}
+
+.pos-btn-remove {
+  width: 24px;
+  height: 24px;
+  background: var(--bg-hover);
+  color: var(--danger);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.14s;
+}
+
+.pos-btn-remove:hover {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+}
+
+/* ── Panel de pago ── */
+.pos-payment {
+  border-top: 1px solid var(--border);
+  background: var(--bg-card);
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
+  transition: background 0.25s, border-color 0.25s;
+}
+
+.pos-payment-footer {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+}
+
+.pos-btn-pay {
+  flex: 1;
+  padding: 12px 18px;
+  border-radius: 50px;
+  border: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.pos-btn-cash {
+  background: var(--bg-card);
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
+}
+
+.pos-btn-cash:hover,
+.pos-btn-cash.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.pos-btn-transfer {
+  background: var(--accent);
+  color: #fff;
+  border: 1.5px solid var(--accent);
+}
+
+.pos-btn-transfer:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.pos-btn-pay:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ── Panel de efectivo ── */
+.pos-cash-panel {
+  background: var(--bg-sidebar);
+  border-top: 1px solid var(--border);
+  padding: 16px 18px 18px;
+  animation: pos-slide-down 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background 0.25s, border-color 0.25s;
+}
+
+@keyframes pos-slide-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.pos-cash-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.pos-cash-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 110px;
+}
+
+.pos-cash-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  transition: color 0.25s;
+}
+
+.pos-cash-input-wrap {
+  position: relative;
+}
+
+.pos-cash-symbol {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.pos-cash-input {
+  width: 100%;
+  padding: 9px 10px 9px 24px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.2s, background 0.25s, color 0.25s;
+}
+
+.pos-cash-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.pos-cash-input::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* ── Cambio / vuelto ── */
+.pos-change-display {
+  display: flex;
+  align-items: center;
+  padding: 9px 10px 9px 24px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  min-height: 40px;
+  position: relative;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.pos-change-display.positive {
+  background: rgba(16, 137, 129, 0.1);
+  border-color: var(--success);
+}
+
+.pos-change-display.positive .pos-cash-symbol { color: var(--success); }
+.pos-change-display.positive .pos-change-value { color: var(--success); }
+
+.pos-change-display.negative {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: var(--danger);
+}
+
+.pos-change-display.negative .pos-cash-symbol { color: var(--danger); }
+.pos-change-display.negative .pos-change-value { color: var(--danger); }
+
+.pos-change-value {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+/* ── Total badge ── */
+.pos-total-badge {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  padding: 5px 0;
+  white-space: nowrap;
+  transition: color 0.25s;
+}
+
+/* ── Botón aceptar ── */
+.pos-btn-accept {
+  padding: 10px 20px;
+  background: var(--success);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  align-self: flex-end;
+}
+
+.pos-btn-accept:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.pos-btn-accept:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Badge de estado (stock) ── */
+.pos-stock-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.pos-stock-ok      { background: var(--success); color: #fff; }
+.pos-stock-low     { background: var(--warning);  color: #fff; }
+.pos-stock-out     { background: var(--danger);   color: #fff; }
+
+/* ── Divider entre secciones ── */
+.pos-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0;
+  transition: border-color 0.25s;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .pos-page {
+    flex-direction: column;
+    padding: 14px;
+    gap: 16px;
+  }
+
+  .pos-left {
+    width: 100%;
+  }
+
+  .pos-cash-row {
+    flex-direction: column;
+  }
+
+  .pos-payment-footer {
+    flex-direction: column;
+  }
+}

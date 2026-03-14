@@ -1,37 +1,46 @@
-import CartItem from "../../../modules/pos/components/CartItem";
+import CartItem from "./CartItem";
 
 /*
 Cart
-
-Lista de productos agregados
-a la venta actual.
+Lista de productos agregados a la venta actual.
+Muestra solo el cabezal cuando está vacío y
+crece dinámicamente con cada producto agregado.
 */
 
-export default function Cart({ cart, increaseQuantity, decreaseQuantity }) {
-
+export default function Cart({ cart, increaseQuantity, decreaseQuantity, onRemove }) {
   return (
-
-    <div className="card p-3 mb-3">
-
-      <h5>Venta actual</h5>
-
-      {cart.length === 0 && (
-        <p className="text-muted">No hay productos</p>
-      )}
-
-      {cart.map((item) => (
-
-        <CartItem
-          key={item.product_id}
-          item={item}
-          increaseQuantity={increaseQuantity}
-          decreaseQuantity={decreaseQuantity}
-        />
-
-      ))}
-
+    <div className="pos-cart-wrap">
+      <table className="pos-cart-table">
+        <thead>
+          <tr className="pos-cart-thead">
+            <th className="pos-th">Codigo</th>
+            <th className="pos-th">Descripción</th>
+            <th className="pos-th">Precio Unit.</th>
+            <th className="pos-th">Cantidad</th>
+            <th className="pos-th">Total</th>
+            <th className="pos-th"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {cart.length === 0 ? (
+            <tr>
+              <td colSpan="6" className="pos-cart-empty">
+                Agregue productos para comenzar
+              </td>
+            </tr>
+          ) : (
+            cart.map((item) => (
+              <CartItem
+                key={item.product_id}
+                item={item}
+                increaseQuantity={increaseQuantity}
+                decreaseQuantity={decreaseQuantity}
+                onRemove={onRemove}
+              />
+            ))
+          )}
+        </tbody>
+      </table>
     </div>
-
   );
-
 }

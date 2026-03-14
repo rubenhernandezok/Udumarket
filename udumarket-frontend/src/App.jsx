@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+
 import Login from "./pages/Login";
 import POS from "./modules/pos/pages/POS";
 import Categories from "./modules/categories/pages/Categories"

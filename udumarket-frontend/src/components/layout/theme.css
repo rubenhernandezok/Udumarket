@@ -1,0 +1,594 @@
+/* =====================================================================
+   UDUMarket — Design Tokens
+   Paleta dark (default) y light, mapeada desde las paletas oficiales.
+   ===================================================================== */
+
+/* ── DARK MODE (default) ─────────────────────────────────────────── */
+:root,
+[data-theme="dark"] {
+
+  /* Fondos */
+  --bg-app:     #0A0F1E;
+  --bg-sidebar: #0F172A;
+  --bg-card:    #1E2938;
+  --bg-hover:   #293548;
+  --border:     #334155;
+
+  /* Acentos */
+  --accent:        #2563EB;
+  --accent-hover:  #1D4ED8;
+  --success:       #108981;
+  --warning:       #F59E0B;
+  --danger:        #EF4444;
+  --danger-hover:  #DC2626;
+
+  /* Tipografía */
+  --text-primary:   #F1F5F9;
+  --text-secondary: #CBD5E1;
+  --text-muted:     #94A3B8;
+  --text-inv:       #FFFFFF;
+
+  /* Internos UI */
+  --topbar-bg:       #0F172A;
+  --icon-btn-bg:     #1E2938;
+  --icon-btn-hover:  #293548;
+  --input-bg:        #1E2938;
+  --input-border:    #334155;
+  --active-pill:     rgba(255,255,255,0.12);
+  --logo-bg:         #1E2938;
+  --scrollbar:       #334155;
+  --table-head-bg:   #293548;
+  --shadow:          0 4px 24px rgba(0,0,0,0.35);
+}
+
+/* ── LIGHT MODE ──────────────────────────────────────────────────── */
+[data-theme="light"] {
+
+  /* Fondos */
+  --bg-app:     #F5F5F5;
+  --bg-sidebar: #E8EDF2;
+  --bg-card:    #FFFFFF;
+  --bg-hover:   #EBF1F7;
+  --border:     #D1D5DB;
+
+  /* Acentos */
+  --accent:        #1849D6;
+  --accent-hover:  #1239B8;
+  --success:       #0D8A65;
+  --warning:       #D97706;
+  --danger:        #DC2626;
+  --danger-hover:  #B91C1C;
+
+  /* Tipografía */
+  --text-primary:   #111827;
+  --text-secondary: #374151;
+  --text-muted:     #6B7280;
+  --text-inv:       #FFFFFF;
+
+  /* Internos UI */
+  --topbar-bg:       #FFFFFF;
+  --icon-btn-bg:     #EBF1F7;
+  --icon-btn-hover:  #D1D5DB;
+  --input-bg:        #FFFFFF;
+  --input-border:    #D1D5DB;
+  --active-pill:     rgba(0,0,0,0.06);
+  --logo-bg:         #FFFFFF;
+  --scrollbar:       #D1D5DB;
+  --table-head-bg:   #EBF1F7;
+  --shadow:          0 4px 24px rgba(0,0,0,0.08);
+}
+
+/* =====================================================================
+   GLOBAL BASE
+   ===================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg-app);
+  color: var(--text-primary);
+  transition: background 0.25s, color 0.25s;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* scrollbar global */
+::-webkit-scrollbar          { width: 5px; height: 5px; }
+::-webkit-scrollbar-track    { background: transparent; }
+::-webkit-scrollbar-thumb    { background: var(--scrollbar); border-radius: 4px; }
+
+/* =====================================================================
+   LAYOUT GRID  (reemplaza las clases de Bootstrap para el shell)
+   ===================================================================== */
+
+.udu-layout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  grid-template-rows: 56px 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* =====================================================================
+   TOPBAR
+   ===================================================================== */
+
+.udu-topbar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  background: var(--topbar-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 0;
+  z-index: 100;
+  transition: background 0.25s, border-color 0.25s;
+}
+
+.udu-topbar__brand {
+  width: 200px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  border-right: 1px solid var(--border);
+  font-family: 'DM Mono', 'Courier New', monospace;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: border-color 0.25s, color 0.25s;
+}
+
+.udu-topbar__brand em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.udu-topbar__title {
+  flex: 1;
+  padding: 0 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.25s;
+}
+
+.udu-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 20px;
+}
+
+/* =====================================================================
+   ICON BUTTON
+   ===================================================================== */
+
+.udu-icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--icon-btn-bg);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+  outline: none;
+  flex-shrink: 0;
+}
+
+.udu-icon-btn:hover {
+  background: var(--icon-btn-hover);
+  color: var(--text-primary);
+  border-color: var(--accent);
+}
+
+.udu-icon-btn svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+/* =====================================================================
+   SIDEBAR
+   ===================================================================== */
+
+.udu-sidebar {
+  grid-row: 2 / 3;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+  transition: background 0.25s, border-color 0.25s;
+}
+
+.udu-sidebar__logo-wrap {
+  padding: 20px 16px 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.udu-sidebar__logo {
+  width: 72px;
+  height: 72px;
+  border-radius: 14px;
+  background: var(--logo-bg);
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  overflow: hidden;
+  transition: background 0.25s, border-color 0.25s;
+  position: relative;
+}
+
+.udu-sidebar__logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+/* ── NAV ─────────────────────────────────────────────────────────── */
+
+.udu-nav {
+  flex: 1;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+}
+
+.udu-nav__item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.18s, color 0.18s;
+  position: relative;
+  white-space: nowrap;
+}
+
+.udu-nav__item:hover:not(.active) {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.udu-nav__item.active {
+  background: var(--accent);
+  color: var(--text-inv);
+  font-weight: 600;
+}
+
+.udu-nav__item.active svg {
+  opacity: 1;
+}
+
+.udu-nav__item svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  opacity: 0.65;
+}
+
+.udu-nav__item.active svg {
+  opacity: 1;
+}
+
+/* ── SIDEBAR FOOTER / LOGOUT ─────────────────────────────────────── */
+
+.udu-sidebar__footer {
+  padding: 10px;
+  border-top: 1px solid var(--border);
+  transition: border-color 0.25s;
+}
+
+.udu-logout-btn {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: background 0.18s;
+  outline: none;
+  letter-spacing: 0.01em;
+}
+
+.udu-logout-btn:hover {
+  background: var(--danger-hover);
+}
+
+.udu-logout-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* =====================================================================
+   MAIN CONTENT AREA
+   ===================================================================== */
+
+.udu-main {
+  grid-row: 2 / 3;
+  overflow-y: auto;
+  background: var(--bg-app);
+  transition: background 0.25s;
+  padding: 1.5rem;
+}
+
+/* =====================================================================
+   CARD / PANEL genérico
+   ===================================================================== */
+
+.udu-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: background 0.25s, border-color 0.25s;
+  overflow: hidden;
+}
+
+/* =====================================================================
+   TABLE
+   ===================================================================== */
+
+.udu-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.udu-table thead th {
+  background: var(--table-head-bg);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  transition: background 0.25s, color 0.25s;
+}
+
+.udu-table tbody td {
+  padding: 11px 16px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  transition: color 0.25s;
+}
+
+.udu-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.udu-table tbody tr:hover td {
+  background: var(--bg-hover);
+}
+
+/* =====================================================================
+   INPUT / FORM CONTROLS
+   ===================================================================== */
+
+.udu-input {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.18s, background 0.25s, color 0.25s;
+  width: 100%;
+}
+
+.udu-input::placeholder {
+  color: var(--text-muted);
+}
+
+.udu-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* =====================================================================
+   BUTTONS
+   ===================================================================== */
+
+.udu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+  outline: none;
+  white-space: nowrap;
+  text-decoration: none;
+  font-family: inherit;
+}
+
+.udu-btn--primary {
+  background: var(--accent);
+  color: var(--text-inv);
+  border-color: var(--accent);
+}
+
+.udu-btn--primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.udu-btn--ghost {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+.udu-btn--ghost:hover {
+  background: var(--border);
+  color: var(--text-primary);
+}
+
+.udu-btn--danger {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+}
+
+.udu-btn--danger:hover {
+  background: var(--danger-hover);
+  border-color: var(--danger-hover);
+}
+
+.udu-btn--success {
+  background: var(--success);
+  color: #fff;
+  border-color: var(--success);
+}
+
+/* =====================================================================
+   BADGES / PILLS
+   ===================================================================== */
+
+.udu-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.udu-badge--success { background: var(--success);  color: #fff; }
+.udu-badge--warning { background: var(--warning);  color: #fff; }
+.udu-badge--danger  { background: var(--danger);   color: #fff; }
+.udu-badge--accent  { background: var(--accent);   color: #fff; }
+.udu-badge--muted   { background: var(--bg-hover); color: var(--text-secondary); border: 1px solid var(--border); }
+
+/* =====================================================================
+   STAT CARD
+   ===================================================================== */
+
+.udu-stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  transition: background 0.25s, border-color 0.25s;
+}
+
+.udu-stat-card__label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  transition: color 0.25s;
+}
+
+.udu-stat-card__value {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: 'DM Mono', monospace;
+  line-height: 1;
+  margin-bottom: 10px;
+  transition: color 0.25s;
+}
+
+/* =====================================================================
+   SECTION HEADER
+   ===================================================================== */
+
+.udu-section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.udu-section-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  transition: color 0.25s;
+}
+
+.udu-section-header p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+  transition: color 0.25s;
+}
+
+/* =====================================================================
+   DIVIDER
+   ===================================================================== */
+
+.udu-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0;
+  transition: border-color 0.25s;
+}
+
+/* =====================================================================
+   UTILITIES
+   ===================================================================== */
+
+.udu-text-muted    { color: var(--text-muted) !important; }
+.udu-text-primary  { color: var(--text-primary) !important; }
+.udu-text-secondary{ color: var(--text-secondary) !important; }
+.udu-bg-card       { background: var(--bg-card) !important; }
+.udu-border        { border: 1px solid var(--border) !important; }
+.udu-rounded       { border-radius: 8px; }
+.udu-rounded-lg    { border-radius: 12px; }

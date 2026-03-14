@@ -1,47 +1,49 @@
 /*
 ProductResults
-
-Muestra los productos encontrados
-y permite agregarlos al carrito.
+Despliega los resultados de búsqueda como dropdown.
 */
 
 export default function ProductResults({ products, onSelectProduct }) {
 
+  if (products.length === 0) return null;
+
   return (
+    <div className="pos-results-dropdown">
 
-    <div className="card p-3">
+      {products.map((product) => (
 
-      <h5>Resultados</h5>
+        <div
+          key={product.id}
+          className={`pos-result-item ${product.stock <= 0 ? "no-stock" : ""}`}
+          onClick={() => {
+            if (product.stock <= 0) return;
 
-      {products.length === 0 && (
-        <p className="text-muted">Sin resultados</p>
-      )}
+            onSelectProduct(product);
+          }}
+        >
 
-      <ul className="list-group">
+          <div className="pos-result-name">
+            {product.name}
+          </div>
 
-        {products.map((product) => (
+          <div className="pos-result-info">
 
-          <li
-            key={product.id}
-            className="list-group-item list-group-item-action"
-            style={{ cursor: "pointer" }}
-            onClick={() => onSelectProduct(product)}
-          >
+            <span className="pos-result-price">
+              ${Number(product.price).toFixed(2)}
+            </span>
 
-            <strong>{product.name}</strong>
+            <span className={`pos-stock ${product.stock <= 3 ? "low" : ""}`}>
+              {product.stock <= 0
+                ? "SIN STOCK"
+                : `Stock: ${product.stock}`}
+            </span>
 
-            <br />
+          </div>
 
-            <small>${product.price}</small>
+        </div>
 
-          </li>
-
-        ))}
-
-      </ul>
+      ))}
 
     </div>
-
   );
-
 }

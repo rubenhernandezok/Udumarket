@@ -1,28 +1,32 @@
-/*
-saleService
-
-Se encarga de enviar la venta al backend
-*/
-
-export const createSale = async (cart, paymentMethod) => {
+export async function createSale(cart, paymentMethod) {
 
   const token = localStorage.getItem("token");
 
-  const response = await fetch(
-    "http://localhost:3000/api/sales",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        items: cart,
-        payment_method: paymentMethod
-      })
-    }
-  );
+  const items = cart.map((item) => ({
+    product_id: item.product_id,
+    quantity: item.quantity,
+    price: item.price
+  }));
 
-  return await response.json();
+  const res = await fetch("http://localhost:3000/api/sales", {
 
-};
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+
+    body: JSON.stringify({
+      items,
+      payment_method: paymentMethod
+    })
+
+  });
+
+  if (!res.ok) {
+    throw new Error("Error registrando venta");
+  }
+
+  return res.json();
+}

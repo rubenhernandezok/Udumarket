@@ -4,148 +4,207 @@ import ProductSearch from "../components/ProductSearch";
 import ProductResults from "../components/ProductResults";
 import Cart from "../components/Cart";
 import PaymentPanel from "../components/PaymentPanel";
-import Layout from "../../../components/layout/Layout"
+import Layout from "../../../components/layout/Layout";
 
 import { getProducts } from "../../products/services/productService";
 
+import "../POS.css";
+
 export default function POS() {
 
-  // todos los productos del negocio
   const [allProducts, setAllProducts] = useState([]);
-
-  // resultados filtrados
   const [products, setProducts] = useState([]);
-
-  // carrito
   const [cart, setCart] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  /*
-    Cargar todos los productos al iniciar POS
-  */
+  // cargar productos
+  useEffect(() => {
+    
+    const loadProducts = async () => {
+      const data = await getProducts();
+      setAllProducts(data || []);
+    };
+    loadProducts();
+  }, []);
 
   useEffect(() => {
 
-    const loadProducts = async () => {
+  if (!searchQuery) return;
 
-      const data = await getProducts();
+  const product = allProducts.find(
+    p => p.barcode === searchQuery
+  );
 
-      setAllProducts(data);
+  if (product) {
+    addProductToCart(product);
+  }
 
-    };
+}, [searchQuery]);
 
-    loadProducts();
-
-  }, []);
-
-  /*
-    Buscar productos en memoria
-  */
-
+  // buscar productos
   const searchProducts = (query) => {
 
-    if (!query) {
-      setProducts([]);
-      return;
-    }
+  setSearchQuery(query);
 
-    const filtered = allProducts.filter(p =>
-      p.name.toLowerCase().includes(query.toLowerCase())
-    );
+  if (!query) {
+    setProducts([]);
+    return;
+  }
 
-    setProducts(filtered.slice(0, 10)); // limitar resultados
+  const filtered = allProducts.filter((p) =>
+    p.name.toLowerCase().includes(query.toLowerCase()) ||
+    p.barcode?.includes(query)
+  );
 
-  };
+  setProducts(filtered.slice(0, 10));
+};
 
-  /*
-    Agregar producto al carrito
-  */
+  // agregar producto al carrito
+ const addProductToCart = (product) => {
 
-  const addProductToCart = (product) => {
+  setCart((prev) => {
 
-    const existing = cart.find(
-      item => item.product_id === product.id
-    );
+    const existing = prev.find((item) => item.product_id === product.id);
 
     if (existing) {
-
-      const updatedCart = cart.map(item =>
+      return prev.map((item) =>
         item.product_id === product.id
           ? {
               ...item,
               quantity: item.quantity + 1,
-              subtotal: (item.quantity + 1) * item.price
+              subtotal: (item.quantity + 1) * item.price,
             }
           : item
       );
+    }
 
-      setCart(updatedCart);
-
-    } else {
-
-      const newItem = {
+    return [
+      ...prev,
+      {
         product_id: product.id,
+        barcode: product.barcode,
         name: product.name,
         price: product.price,
         quantity: 1,
-        subtotal: product.price
-      };
+        subtotal: product.price,
+      },
+    ];
+  });
 
-      setCart([...cart, newItem]);
+  setProducts([]);
 
-    }
+  // 👇 limpia buscador
+  setSearchQuery("");
+};
 
-  };
 
+  // aumentar cantidad
   const increaseQuantity = (id) => {
-
-    const updated = cart.map(item =>
-      item.product_id === id
-        ? {
-            ...item,
-            quantity: item.quantity + 1,
-            subtotal: (item.quantity + 1) * item.price
-          }
-        : item
-    );
-
-    setCart(updated);
-
-  };
-
-  const decreaseQuantity = (id) => {
-
-    const updated = cart
-      .map(item =>
+    setCart((prev) =>
+      prev.map((item) =>
         item.product_id === id
           ? {
               ...item,
-              quantity: item.quantity - 1,
-              subtotal: (item.quantity - 1) * item.price
+              quantity: item.quantity + 1,
+              subtotal: (item.quantity + 1) * item.price,
             }
           : item
       )
-      .filter(item => item.quantity > 0);
-
-    setCart(updated);
-
+    );
   };
 
-  const total = cart.reduce(
-    (acc, item) => acc + item.subtotal,
-    0
+  // disminuir cantidad
+  const decreaseQuantity = (id) => {
+    setCart((prev) =>
+      prev
+        .map((item) =>
+          item.product_id === id
+            ? {
+                ...item,
+                quantity: item.quantity - 1,
+                subtotal: (item.quantity - 1) * item.price,
+              }
+            : item
+        )
+        .filter((item) => item.quantity > 0)
+    );
+  };
+
+  // editar cantidad manual
+ const updateQuantity = (id, value) => {
+
+  if (value === "") {
+
+    setCart((prev) =>
+      prev.map((item) =>
+        item.product_id === id
+          ? { ...item, quantity: "" }
+          : item
+      )
+    );
+
+    return;
+  }
+
+  const num = parseFloat(value);
+
+  if (isNaN(num) || num <= 0) return;
+
+  setCart((prev) =>
+    prev.map((item) =>
+      item.product_id === id
+        ? {
+            ...item,
+            quantity: num,
+            subtotal: num * item.price,
+          }
+        : item
+    )
   );
+};
+
+
+  // eliminar producto
+  const removeFromCart = (id) => {
+    setCart((prev) => prev.filter((item) => item.product_id !== id));
+  };
+
+  // limpiar carrito
+  const clearCart = () => {
+    setCart([]);
+  };
+
+  const reloadProducts = async () => {
+
+  const data = await getProducts();
+
+  setAllProducts(data || []);
+};
+
+
+  const total = cart.reduce((acc, item) => acc + item.subtotal, 0);
 
   return (
-
     <Layout>
 
-      <div className="container mt-4">
+      <div className="pos-page">
 
-        <div className="row">
+        {/* IZQUIERDA */}
+        <div className="pos-left">
 
-          <div className="col-md-5">
+          <div className="pos-section-title">
+            <span className="pos-title-icon">🛒</span>
+            Ventas
+          </div>
 
-            <ProductSearch onSearch={searchProducts} />
+          <div className="pos-search-block">
+
+            <ProductSearch
+  query={searchQuery}
+  onSearch={searchProducts}
+  onClearCart={clearCart}
+/>
+
 
             <ProductResults
               products={products}
@@ -154,28 +213,34 @@ export default function POS() {
 
           </div>
 
-          <div className="col-md-7">
+        </div>
 
-            <Cart
-              cart={cart}
-              increaseQuantity={increaseQuantity}
-              decreaseQuantity={decreaseQuantity}
-            />
+        {/* DERECHA */}
+        <div className="pos-right">
 
-            <PaymentPanel
-              cart={cart}
-              total={total}
-              setCart={setCart}
-            />
+          <Cart
+            cart={cart}
+            increaseQuantity={increaseQuantity}
+            decreaseQuantity={decreaseQuantity}
+            updateQuantity={updateQuantity}
+            onRemove={removeFromCart}
+          />
 
-          </div>
+          <PaymentPanel
+  cart={cart}
+  total={total}
+  setCart={setCart}
+  clearCart={() => {
+    clearCart();
+    reloadProducts();
+  }}
+/>
+
 
         </div>
 
       </div>
 
     </Layout>
-
   );
-
 }

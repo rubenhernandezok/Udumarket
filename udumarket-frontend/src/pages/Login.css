@@ -1,0 +1,346 @@
+/* ============================================================
+   Login.css — Pantalla de autenticación UDUMarket
+   Usa los tokens de theme.css. Sin fuentes externas.
+   ============================================================ */
+
+/* ── Página completa ── */
+.login-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg-app);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  font-family: inherit;
+  color: var(--text-primary);
+  transition: background 0.25s;
+}
+
+/* ── Header de marca ── */
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-brand {
+  font-size: clamp(2rem, 8vw, 3.2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-family: 'Courier New', monospace;
+}
+
+.login-brand__udu {
+  color: var(--accent);
+}
+
+.login-brand__market {
+  color: var(--text-primary);
+}
+
+.login-brand__sub {
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 6px;
+  letter-spacing: 0.04em;
+  font-family: inherit;
+  transition: color 0.25s;
+}
+
+/* ── Card ── */
+.login-card {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  max-width: 540px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+  transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+
+/* ── Panel izquierdo (acento) ── */
+.login-panel-left {
+  width: 180px;
+  flex-shrink: 0;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-panel-left::after {
+  content: '';
+  position: absolute;
+  bottom: -40px;
+  right: -40px;
+  width: 120px;
+  height: 120px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.login-icon-wrap {
+  position: relative;
+  z-index: 1;
+  width: 80px;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+}
+
+.login-mobile-text {
+  display: none;
+}
+
+/* ── Panel derecho (formulario) ── */
+.login-panel-right {
+  flex: 1;
+  background: var(--bg-card);
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  transition: background 0.25s;
+}
+
+.login-panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  transition: color 0.25s;
+}
+
+.login-panel-title span {
+  color: var(--text-muted);
+  font-weight: 400;
+  font-size: 13px;
+  display: block;
+  margin-top: 3px;
+  transition: color 0.25s;
+}
+
+/* ── Campos del formulario ── */
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 14px;
+}
+
+.login-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: color 0.25s;
+}
+
+.login-input-wrap {
+  position: relative;
+}
+
+.login-input {
+  width: 100%;
+  padding: 10px 38px 10px 12px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--input-bg);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.25s, color 0.25s;
+  -webkit-appearance: none;
+}
+
+.login-input::placeholder {
+  color: var(--text-muted);
+}
+
+.login-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* ── Botón ojo contraseña ── */
+.login-eye-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 5px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.login-eye-btn:hover {
+  color: var(--accent);
+}
+
+/* ── Botón submit ── */
+.login-btn {
+  width: 100%;
+  margin-top: 6px;
+  padding: 12px;
+  background: var(--accent);
+  color: var(--text-inv);
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.login-btn:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.login-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Soporte ── */
+.login-support {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 12px;
+  transition: color 0.25s;
+}
+
+.login-support a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-support a:hover {
+  text-decoration: underline;
+}
+
+/* ── Footer ── */
+.login-footer {
+  margin-top: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+  transition: color 0.25s;
+}
+
+/* ── Mobile ≤ 480px ── */
+@media (max-width: 480px) {
+  .login-page {
+    padding: 28px 12px;
+    justify-content: flex-start;
+    padding-top: 40px;
+  }
+
+  .login-header {
+    margin-bottom: 20px;
+  }
+
+  .login-card {
+    flex-direction: column;
+  }
+
+  .login-panel-left {
+    width: 100%;
+    padding: 16px 20px;
+    flex-direction: row;
+    gap: 14px;
+    justify-content: flex-start;
+  }
+
+  .login-panel-left::after {
+    width: 70px;
+    height: 70px;
+    bottom: -15px;
+    right: -15px;
+  }
+
+  .login-icon-wrap {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    border-radius: 10px;
+  }
+
+  .login-mobile-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .login-mobile-brand {
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .login-mobile-sub {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 11px;
+    font-style: italic;
+    margin-top: 2px;
+  }
+
+  .login-panel-right {
+    padding: 20px 18px;
+  }
+
+  .login-input {
+    font-size: 1rem;
+    padding: 12px 38px 12px 12px;
+  }
+
+  .login-btn {
+    padding: 14px;
+    font-size: 0.95rem;
+  }
+}
+
+/* ── Tablet 481–768px ── */
+@media (min-width: 481px) and (max-width: 768px) {
+  .login-panel-left {
+    width: 150px;
+  }
+}
