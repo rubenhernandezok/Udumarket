@@ -29,17 +29,24 @@ export const createProduct = async (product) => {
 
 export const updateProduct = async (id, product) => {
 
-  const res = await fetch(`${API}/${id}`, {
+  const token = localStorage.getItem("token")
+
+  const res = await fetch(`http://localhost:3000/api/products/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${getToken()}`
+      Authorization: `Bearer ${token}`
     },
     body: JSON.stringify(product)
   })
 
-  return await res.json()
+  if (!res.ok) {
+    throw new Error("Error actualizando producto")
+  }
+
+  return res.json()
 }
+
 
 export const deleteProduct = async (id) => {
 

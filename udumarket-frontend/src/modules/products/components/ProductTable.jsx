@@ -1,52 +1,129 @@
-export default function ProductTable({ products, onDelete }) {
+export default function ProductTable({ products, onDelete, onEdit }) {
 
-  if (products.length === 0) {
-    return <p className="text-muted">No hay productos</p>
+  const formatUnit = (unit) => {
+
+    switch (unit) {
+      case "unit":
+        return "unidades"
+      case "kg":
+        return "kg"
+      case "liter":
+        return "litros"
+      default:
+        return unit
+    }
+
   }
 
   return (
 
-    <table className="table">
+    <div className="card mt-4">
 
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Precio</th>
-          <th>Stock</th>
-          <th>Categoría</th>
-          <th></th>
-        </tr>
-      </thead>
+      <div className="card-body">
 
-      <tbody>
+        <table className="table table-striped table-hover">
 
-        {products.map(p => (
+          <thead>
 
-          <tr key={p.id}>
+            <tr>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Categoría</th>
+              <th>Unidad</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
 
-            <td>{p.name}</td>
-            <td>${p.price}</td>
-            <td>{p.stock}</td>
-            <td>{p.categories?.name}</td>
+          </thead>
 
-            <td>
+          <tbody>
 
-              <button
-                className="btn btn-sm btn-danger"
-                onClick={() => onDelete(p.id)}
-              >
-                eliminar
-              </button>
+            {products.length === 0 ? (
 
-            </td>
+              <tr>
+                <td colSpan="8" className="text-center text-muted">
+                  No hay productos
+                </td>
+              </tr>
 
-          </tr>
+            ) : (
 
-        ))}
+              products.map((p) => {
 
-      </tbody>
+                const lowStock = p.stock_min && p.stock <= p.stock_min
 
-    </table>
+                return (
+
+                  <tr key={p.id}>
+
+                    <td>{p.barcode || "-"}</td>
+
+                    <td>{p.name}</td>
+
+                    <td>{p.categories?.name || "-"}</td>
+
+                    <td>{formatUnit(p.unit_type)}</td>
+
+                    <td>${Number(p.price).toFixed(2)}</td>
+
+                    <td
+                      style={{
+                        color: lowStock ? "red" : "inherit",
+                        fontWeight: lowStock ? "bold" : "normal"
+                      }}
+                    >
+                      {p.stock} {formatUnit(p.unit_type)}
+                    </td>
+
+                    <td>
+
+                      {lowStock ? (
+                        <span className="badge bg-danger">
+                          Stock bajo
+                        </span>
+                      ) : (
+                        <span className="badge bg-success">
+                          OK
+                        </span>
+                      )}
+
+                    </td>
+
+                    <td>
+
+                      <button
+                        className="btn btn-sm btn-warning me-2"
+                        onClick={() => onEdit(p)}
+                      >
+                        Editar
+                      </button>
+
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => onDelete(p.id)}
+                      >
+                        Eliminar
+                      </button>
+
+                    </td>
+
+                  </tr>
+
+                )
+
+              })
+
+            )}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
 
   )
 
