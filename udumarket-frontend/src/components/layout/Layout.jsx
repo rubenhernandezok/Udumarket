@@ -1,3 +1,4 @@
+import { useState } from "react"
 import Sidebar from "./Sidebar"
 import Header from "./Header"
 import { ThemeProvider } from "./ThemeContext"
@@ -19,6 +20,16 @@ La estructura de grilla está en .udu-layout (theme.css):
 
 export default function Layout({ children }) {
 
+    const [sidebarOpen, setSidebarOpen] = useState(false)
+
+    const toggleSidebar = () => {
+        setSidebarOpen((prev) => !prev)
+    }
+
+    const closeSidebar = () => {
+        setSidebarOpen(false)
+    }
+
     return (
 
         <ThemeProvider>
@@ -26,10 +37,25 @@ export default function Layout({ children }) {
             <div className="udu-layout">
 
                 {/* Topbar — ocupa col 1 y 2 completas */}
-                <Header />
+                <Header
+                    onToggleSidebar={toggleSidebar}
+                    isSidebarOpen={sidebarOpen}
+                />
 
                 {/* Sidebar — col 1, fila 2 */}
-                <Sidebar />
+                <Sidebar
+                    isOpen={sidebarOpen}
+                    onClose={closeSidebar}
+                />
+
+                {sidebarOpen && (
+                    <button
+                        type="button"
+                        className="udu-sidebar__overlay"
+                        onClick={closeSidebar}
+                        aria-label="Cerrar menÃº"
+                    />
+                )}
 
                 {/* Contenido principal — col 2, fila 2 */}
                 <main className="udu-main">

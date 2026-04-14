@@ -89,7 +89,7 @@ const navClass = ({ isActive }) =>
 
 /* ── Componente ───────────────────────────────────────────────────── */
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onClose }) {
 
     const handleLogout = () => {
         localStorage.removeItem("token")
@@ -98,7 +98,7 @@ export default function Sidebar() {
 
     return (
 
-        <aside className="udu-sidebar">
+        <aside className={"udu-sidebar" + (isOpen ? " udu-sidebar--open" : "")}>
 
             {/* Logo del negocio */}
             <div className="udu-sidebar__logo-wrap">
@@ -111,39 +111,40 @@ export default function Sidebar() {
             <ul className="udu-nav">
 
                 <li>
-                    <NavLink className={navClass} to="/pos">
+                    <NavLink className={navClass} to="/pos" onClick={onClose}>
                         <IconSales />
                         Ventas
                     </NavLink>
                 </li>
 
                 <li>
-                    <NavLink className={navClass} to="/products">
+                    <NavLink className={navClass} to="/products" onClick={onClose}>
                         <IconProducts />
                         Productos
                     </NavLink>
                 </li>
 
                 <li>
-                    <NavLink className={navClass} to="/categories">
+                    <NavLink className={navClass} to="/categories" onClick={onClose}>
                         <IconCategories />
                         Categorías
                     </NavLink>
                 </li>
 
                 <li>
-                    <NavLink className={navClass} to="/clients">
-                        <IconClients />
-                        Clientes
-                    </NavLink>
-                </li>
-
-                <li>
-                    <NavLink className={navClass} to="/dashboard">
+                    <NavLink className={navClass} to="/dashboard" onClick={onClose}>
                         <IconStats />
                         Estadísticas
                     </NavLink>
                 </li>
+
+                <li>
+                    <NavLink className={navClass} to="/sales" onClick={onClose}>
+                        <IconClients />
+                        Registro de ventas
+                    </NavLink>
+                </li>
+
 
             </ul>
 

@@ -1,0 +1,174 @@
+.udu-page {
+  color: var(--text-primary);
+}
+
+/* Cards */
+.udu-page .card,
+.udu-page .modal-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  transition: background 0.25s, border-color 0.25s, color 0.25s;
+}
+
+.udu-page .shadow-sm {
+  box-shadow: var(--shadow) !important;
+}
+
+.udu-page .card h1,
+.udu-page .card h2,
+.udu-page .card h3,
+.udu-page .card h4,
+.udu-page .card h5,
+.udu-page .card h6 {
+  color: var(--text-primary);
+}
+
+/* Table */
+.udu-page .table {
+  color: var(--text-secondary);
+}
+
+.udu-page .table thead th {
+  background: var(--table-head-bg);
+  color: var(--text-muted);
+  border-color: var(--border);
+  transition: background 0.25s, color 0.25s, border-color 0.25s;
+}
+
+.udu-page .table td,
+.udu-page .table th {
+  border-color: var(--border);
+}
+
+.udu-page .table-striped > tbody > tr:nth-of-type(odd) > * {
+  background: var(--bg-card) !important;
+  color: var(--text-secondary);
+}
+
+.udu-page .table-striped > tbody > tr:nth-of-type(even) > * {
+  background: var(--bg-card) !important;
+  color: var(--text-secondary);
+}
+
+.udu-page .table > :not(caption) > * > * {
+  background: var(--bg-card);
+}
+
+/* Estado pago */
+.udu-page .payment-method {
+  font-weight: 600;
+}
+
+.udu-page .payment-method--cash {
+  color: var(--success);
+}
+
+.udu-page .payment-method--transfer {
+  color: var(--accent);
+}
+
+.udu-page .table-hover > tbody > tr:hover > * {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Forms */
+.udu-page .form-control,
+.udu-page .form-select {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--text-primary);
+  transition: background 0.25s, border-color 0.2s, color 0.25s;
+}
+
+.udu-page .form-control::placeholder {
+  color: var(--text-muted);
+}
+
+.udu-page .form-control:focus,
+.udu-page .form-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* Lists */
+.udu-page .list-group-item {
+  background: var(--bg-card);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+/* Text helpers */
+.udu-page .text-muted {
+  color: var(--text-muted) !important;
+}
+
+.udu-page .text-danger {
+  color: var(--danger) !important;
+}
+
+/* Buttons */
+.udu-page .btn {
+  border-radius: 8px;
+  transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.12s;
+}
+
+.udu-page .btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.udu-page .btn-primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.udu-page .btn-outline-primary {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.udu-page .btn-outline-primary:hover {
+  background: var(--accent);
+  color: var(--text-inv);
+}
+
+.udu-page .btn-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.udu-page .btn-danger:hover {
+  background: var(--danger-hover);
+  border-color: var(--danger-hover);
+}
+
+.udu-page .btn-warning {
+  background: var(--warning);
+  border-color: var(--warning);
+  color: #111;
+}
+
+.udu-page .btn-success {
+  background: var(--success);
+  border-color: var(--success);
+}
+
+/* Badges */
+.udu-page .badge.bg-danger { background: var(--danger) !important; }
+.udu-page .badge.bg-success { background: var(--success) !important; }
+.udu-page .badge.bg-warning { background: var(--warning) !important; color: #111 !important; }
+
+/* Modal */
+.udu-page .modal-header {
+  border-bottom: 1px solid var(--border);
+}
+
+.udu-page .modal-footer {
+  border-top: 1px solid var(--border);
+}
+
+[data-theme="dark"] .udu-page .btn-close {
+  filter: invert(1);
+}

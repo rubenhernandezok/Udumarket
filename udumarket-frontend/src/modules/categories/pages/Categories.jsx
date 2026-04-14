@@ -11,16 +11,17 @@ import {
   deleteCategory
 } from "../services/categoryService"
 
+import usePagination from "../../../hooks/usePagination"
+import Pagination from "../../../components/common/Pagination"
+import "../../shared/uduPage.css"
+
 export default function Categories() {
 
   const [categories, setCategories] = useState([])
 
   const loadCategories = async () => {
-
     const data = await getCategories()
-
-    setCategories(data)
-
+    setCategories(data || [])
   }
 
   useEffect(() => {
@@ -28,34 +29,47 @@ export default function Categories() {
   }, [])
 
   const handleCreate = async (name) => {
-
     await createCategory(name)
-
-    loadCategories()
-
+    await loadCategories()
+    resetPage()
   }
 
   const handleDelete = async (id) => {
-
     await deleteCategory(id)
-
-    loadCategories()
-
+    await loadCategories()
+    resetPage()
   }
+
+  // 🔥 PAGINACIÓN
+  const {
+    currentPage,
+    totalPages,
+    paginatedData,
+    nextPage,
+    prevPage,
+    resetPage
+  } = usePagination(categories, 12)
 
   return (
 
     <Layout>
 
-      <div className="container mt-4">
+      <div className="container mt-4 udu-page">
 
         <h2>Categorías</h2>
 
         <CategoryForm onCreate={handleCreate} />
 
         <CategoryList
-          categories={categories}
+          categories={paginatedData}
           onDelete={handleDelete}
+        />
+
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPrev={prevPage}
+          onNext={nextPage}
         />
 
       </div>

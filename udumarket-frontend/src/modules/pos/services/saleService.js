@@ -30,3 +30,24 @@ export async function createSale(cart, paymentMethod) {
 
   return res.json();
 }
+
+export const getSales = async (page = 1, limit = 12, filters = {}) => {
+
+  const token = localStorage.getItem("token")
+
+  const params = new URLSearchParams({
+    page,
+    limit,
+    ...filters
+  })
+
+  const res = await fetch(`http://localhost:3000/api/sales?${params}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+
+  if (!res.ok) throw new Error("Error obteniendo ventas")
+
+  return res.json()
+}

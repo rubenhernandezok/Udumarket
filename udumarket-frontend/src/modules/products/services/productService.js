@@ -2,15 +2,17 @@ const API = "http://localhost:3000/api/products"
 
 const getToken = () => localStorage.getItem("token")
 
-export const getProducts = async () => {
+export const getProducts = async (page = 1, limit = 12) => {
 
-  const res = await fetch(API, {
+  const res = await fetch(`${API}?page=${page}&limit=${limit}`, {
     headers: {
       Authorization: `Bearer ${getToken()}`
     }
   })
 
-  return await res.json()
+  if (!res.ok) throw new Error("Error obteniendo productos")
+
+  return res.json()
 }
 
 export const createProduct = async (product) => {

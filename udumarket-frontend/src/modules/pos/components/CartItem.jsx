@@ -3,6 +3,7 @@ export default function CartItem({
   increaseQuantity,
   decreaseQuantity,
   updateQuantity,
+  commitQuantity,
   onRemove
 }) {
 
@@ -33,18 +34,31 @@ export default function CartItem({
           </button>
 
           <input
-  type="number"
-  step="0.01"
-  min="0"
-  value={item.quantity}
-  className="pos-qty-input"
-  onChange={(e) =>
-    updateQuantity(
-      item.product_id,
-      e.target.value
-    )
-  }
-/>
+            type="number"
+            step={item.unit_type === "kg" ? "0.001" : "1"}
+            min="0"
+            value={item.quantity_input ?? item.quantity}
+            className="pos-qty-input"
+            onChange={(e) =>
+              updateQuantity(
+                item.product_id,
+                e.target.value
+              )
+            }
+            onBlur={(e) =>
+              commitQuantity(
+                item.product_id,
+                e.target.value
+              )
+            }
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                commitQuantity(item.product_id, e.currentTarget.value);
+                e.currentTarget.blur();
+              }
+            }}
+          />
 
 
           <button

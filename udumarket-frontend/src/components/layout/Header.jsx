@@ -57,9 +57,20 @@ function IconSettings() {
     )
 }
 
+function IconMenu() {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+            strokeLinecap="round" strokeLinejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+    )
+}
+
 /* ── Componente ───────────────────────────────────────────────────── */
 
-export default function Header() {
+export default function Header({ onToggleSidebar, isSidebarOpen }) {
 
     const { theme, toggleTheme } = useTheme()
 
@@ -71,6 +82,15 @@ export default function Header() {
     return (
 
         <header className="udu-topbar">
+
+            <button
+                className="udu-icon-btn udu-topbar__menu"
+                onClick={onToggleSidebar}
+                aria-label={isSidebarOpen ? "Cerrar menÃº" : "Abrir menÃº"}
+                title={isSidebarOpen ? "Cerrar menÃº" : "Abrir menÃº"}
+            >
+                <IconMenu />
+            </button>
 
             {/* Marca — alineada con el ancho del sidebar */}
             <div className="udu-topbar__brand">

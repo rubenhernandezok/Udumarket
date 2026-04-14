@@ -17,170 +17,252 @@ export default function POS() {
   const [cart, setCart] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // cargar productos
-  useEffect(() => {
-    
-    const loadProducts = async () => {
-      const data = await getProducts();
-      setAllProducts(data || []);
-    };
-    loadProducts();
-  }, []);
+  const roundQuantity = (num, unitType) => {
+    if (unitType === "kg") {
+      return Math.round(num * 1000) / 1000;
+    }
+    return Math.round(num);
+  };
 
-  useEffect(() => {
+  const formatQuantityForInput = (num, unitType) => {
+    if (num === "" || num === null || num === undefined) return "";
+    if (unitType === "kg") {
+      const rounded = Math.round(num * 1000) / 1000;
+      return String(rounded).replace(/\.?0+$/, "");
+    }
+    return String(Math.round(num));
+  };
 
-  if (!searchQuery) return;
+  const parseQuantityForItem = (item, rawValue) => {
+    if (rawValue === "") return "";
 
-  const product = allProducts.find(
-    p => p.barcode === searchQuery
-  );
+    const normalized = String(rawValue).replace(",", ".").trim();
+    const num = parseFloat(normalized);
 
-  if (product) {
-    addProductToCart(product);
-  }
+    if (isNaN(num) || num <= 0) return null;
 
-}, [searchQuery]);
-
-  // buscar productos
-  const searchProducts = (query) => {
-
-  setSearchQuery(query);
-
-  if (!query) {
-    setProducts([]);
-    return;
-  }
-
-  const filtered = allProducts.filter((p) =>
-    p.name.toLowerCase().includes(query.toLowerCase()) ||
-    p.barcode?.includes(query)
-  );
-
-  setProducts(filtered.slice(0, 10));
-};
-
-  // agregar producto al carrito
- const addProductToCart = (product) => {
-
-  setCart((prev) => {
-
-    const existing = prev.find((item) => item.product_id === product.id);
-
-    if (existing) {
-      return prev.map((item) =>
-        item.product_id === product.id
-          ? {
-              ...item,
-              quantity: item.quantity + 1,
-              subtotal: (item.quantity + 1) * item.price,
-            }
-          : item
-      );
+    if (item.unit_type === "kg") {
+      const hasDecimal = normalized.includes(".");
+      if (!hasDecimal && num >= 10) {
+        return roundQuantity(num / 1000, "kg");
+      }
+      return roundQuantity(num, "kg");
     }
 
-    return [
-      ...prev,
-      {
-        product_id: product.id,
-        barcode: product.barcode,
-        name: product.name,
-        price: product.price,
-        quantity: 1,
-        subtotal: product.price,
-      },
-    ];
-  });
+    return roundQuantity(num, "unit");
+  };
 
-  setProducts([]);
+  // 🔥 cargar productos (FIX CLAVE)
+  useEffect(() => {
 
-  // 👇 limpia buscador
-  setSearchQuery("");
-};
+    const loadProducts = async () => {
+      try {
+        const res = await getProducts();
+        setAllProducts(res.data || []); // 🔥 FIX
+      } catch (error) {
+        console.error("Error cargando productos:", error);
+        setAllProducts([]);
+      }
+    };
 
+    loadProducts();
 
-  // aumentar cantidad
+  }, []);
+
+  // 🔥 ESCANEO POR CÓDIGO DE BARRAS (FIX SAFE)
+  useEffect(() => {
+
+    if (!searchQuery || !Array.isArray(allProducts)) return;
+
+    const product = allProducts.find(
+      (p) => p.barcode === searchQuery
+    );
+
+    if (product) {
+      addProductToCart(product);
+    }
+
+  }, [searchQuery, allProducts]);
+
+  // 🔍 buscar productos (FIX SAFE)
+  const searchProducts = (query) => {
+
+    setSearchQuery(query);
+
+    if (!query || !Array.isArray(allProducts)) {
+      setProducts([]);
+      return;
+    }
+
+    const filtered = allProducts.filter((p) =>
+      p.name?.toLowerCase().includes(query.toLowerCase()) ||
+      p.barcode?.includes(query)
+    );
+
+    setProducts(filtered.slice(0, 10));
+  };
+
+  // 🛒 agregar producto al carrito
+  const addProductToCart = (product) => {
+
+    setCart((prev) => {
+
+      const existing = prev.find((item) => item.product_id === product.id);
+
+      const currentQty = existing ? Number(existing.quantity) || 0 : 0;
+      const available = Number(product.stock || 0) - currentQty;
+      if (available <= 0) return prev;
+
+      if (existing) {
+        return prev.map((item) =>
+          item.product_id === product.id
+            ? (() => {
+                const nextQty = roundQuantity((Number(item.quantity) || 0) + 1, item.unit_type);
+                return {
+              ...item,
+              quantity: nextQty,
+              quantity_input: formatQuantityForInput(nextQty, item.unit_type),
+              subtotal: nextQty * item.price,
+            };
+          })()
+            : item
+        );
+      }
+
+      return [
+        ...prev,
+        {
+          product_id: product.id,
+          barcode: product.barcode,
+          name: product.name,
+          price: product.price,
+          unit_type: product.unit_type || "unit",
+          quantity: 1,
+          quantity_input: "1",
+          subtotal: product.price,
+        },
+      ];
+    });
+
+    setProducts([]);
+    setSearchQuery(""); // 🔥 limpiar buscador
+  };
+
+  // ➕ aumentar cantidad
   const increaseQuantity = (id) => {
     setCart((prev) =>
       prev.map((item) =>
-        item.product_id === id
-          ? {
-              ...item,
-              quantity: item.quantity + 1,
-              subtotal: (item.quantity + 1) * item.price,
-            }
-          : item
+        item.product_id === id ? (() => {
+          const step = item.unit_type === "kg" ? 0.1 : 1;
+          const nextQty = roundQuantity((Number(item.quantity) || 0) + step, item.unit_type);
+          return {
+            ...item,
+            quantity: nextQty,
+            quantity_input: formatQuantityForInput(nextQty, item.unit_type),
+            subtotal: nextQty * item.price,
+          };
+        })() : item
       )
     );
   };
 
-  // disminuir cantidad
+  // ➖ disminuir cantidad
   const decreaseQuantity = (id) => {
     setCart((prev) =>
       prev
         .map((item) =>
-          item.product_id === id
-            ? {
-                ...item,
-                quantity: item.quantity - 1,
-                subtotal: (item.quantity - 1) * item.price,
-              }
-            : item
+          item.product_id === id ? (() => {
+            const step = item.unit_type === "kg" ? 0.1 : 1;
+            const nextQty = roundQuantity((Number(item.quantity) || 0) - step, item.unit_type);
+            return {
+              ...item,
+              quantity: nextQty,
+              quantity_input: formatQuantityForInput(nextQty, item.unit_type),
+              subtotal: nextQty * item.price,
+            };
+          })() : item
         )
         .filter((item) => item.quantity > 0)
     );
   };
 
-  // editar cantidad manual
- const updateQuantity = (id, value) => {
+  // ✏️ editar cantidad manual
+  const updateQuantity = (id, value) => {
 
-  if (value === "") {
+    if (value === "") {
+      setCart((prev) =>
+        prev.map((item) =>
+          item.product_id === id
+            ? { ...item, quantity_input: "" }
+            : item
+        )
+      );
+      return;
+    }
 
     setCart((prev) =>
       prev.map((item) =>
         item.product_id === id
-          ? { ...item, quantity: "" }
+          ? { ...item, quantity_input: value }
           : item
       )
     );
+  };
 
-    return;
-  }
+  const commitQuantity = (id, value) => {
+    setCart((prev) => {
+      const targetItem = prev.find((item) => item.product_id === id);
+      if (!targetItem) return prev;
 
-  const num = parseFloat(value);
+      if (value === "") {
+        return prev.map((item) =>
+          item.product_id === id
+            ? { ...item, quantity_input: formatQuantityForInput(item.quantity, item.unit_type) }
+            : item
+        );
+      }
 
-  if (isNaN(num) || num <= 0) return;
+      const parsed = parseQuantityForItem(targetItem, value);
+      if (parsed === null || parsed === "") {
+        return prev.map((item) =>
+          item.product_id === id
+            ? { ...item, quantity_input: formatQuantityForInput(item.quantity, item.unit_type) }
+            : item
+        );
+      }
 
-  setCart((prev) =>
-    prev.map((item) =>
-      item.product_id === id
-        ? {
-            ...item,
-            quantity: num,
-            subtotal: num * item.price,
-          }
-        : item
-    )
-  );
-};
+      return prev.map((item) =>
+        item.product_id === id
+          ? {
+              ...item,
+              quantity: parsed,
+              quantity_input: formatQuantityForInput(parsed, item.unit_type),
+              subtotal: parsed * item.price,
+            }
+          : item
+      );
+    });
+  };
 
-
-  // eliminar producto
+  // ❌ eliminar producto
   const removeFromCart = (id) => {
     setCart((prev) => prev.filter((item) => item.product_id !== id));
   };
 
-  // limpiar carrito
+  // 🧹 limpiar carrito
   const clearCart = () => {
     setCart([]);
   };
 
+  // 🔄 recargar productos (FIX CLAVE)
   const reloadProducts = async () => {
-
-  const data = await getProducts();
-
-  setAllProducts(data || []);
-};
-
+    try {
+      const res = await getProducts();
+      setAllProducts(res.data || []); // 🔥 FIX
+    } catch (error) {
+      console.error("Error recargando productos:", error);
+    }
+  };
 
   const total = cart.reduce((acc, item) => acc + item.subtotal, 0);
 
@@ -200,16 +282,16 @@ export default function POS() {
           <div className="pos-search-block">
 
             <ProductSearch
-  query={searchQuery}
-  onSearch={searchProducts}
-  onClearCart={clearCart}
-/>
-
-
-            <ProductResults
-              products={products}
-              onSelectProduct={addProductToCart}
+              query={searchQuery}
+              onSearch={searchProducts}
+              onClearCart={clearCart}
             />
+
+          <ProductResults
+            products={products}
+            cart={cart}
+            onSelectProduct={addProductToCart}
+          />
 
           </div>
 
@@ -223,19 +305,24 @@ export default function POS() {
             increaseQuantity={increaseQuantity}
             decreaseQuantity={decreaseQuantity}
             updateQuantity={updateQuantity}
+            commitQuantity={commitQuantity}
             onRemove={removeFromCart}
           />
 
-          <PaymentPanel
-  cart={cart}
-  total={total}
-  setCart={setCart}
-  clearCart={() => {
-    clearCart();
-    reloadProducts();
-  }}
-/>
+          <div className="pos-cart-total">
+            <span className="pos-cart-total-label">Total venta</span>
+            <span className="pos-cart-total-value">${total.toFixed(2)}</span>
+          </div>
 
+          <PaymentPanel
+            cart={cart}
+            total={total}
+            setCart={setCart}
+            clearCart={() => {
+              clearCart();
+              reloadProducts(); // 🔥 importante
+            }}
+          />
 
         </div>
 

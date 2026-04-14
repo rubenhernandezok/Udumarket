@@ -6,6 +6,7 @@ import POS from "./modules/pos/pages/POS";
 import Categories from "./modules/categories/pages/Categories"
 import Products from "./modules/products/pages/Products"
 import Dashboard from "./modules/dashboard/pages/Dashboard"
+import Sales from "./modules/pos/pages/Sales";
 import PrivateRoute from "./routes/PrivateRoute";
 
 function App() {
@@ -52,6 +53,15 @@ function App() {
   element={
     <PrivateRoute>
       <Dashboard />
+    </PrivateRoute>
+  }
+/>
+
+<Route
+  path="/sales"
+  element={
+    <PrivateRoute>
+      <Sales />
     </PrivateRoute>
   }
 />

@@ -7,7 +7,14 @@ Muestra solo el cabezal cuando está vacío y
 crece dinámicamente con cada producto agregado.
 */
 
-export default function Cart({ cart, increaseQuantity, decreaseQuantity, onRemove }) {
+export default function Cart({
+  cart,
+  increaseQuantity,
+  decreaseQuantity,
+  updateQuantity,
+  commitQuantity,
+  onRemove
+}) {
   return (
     <div className="pos-cart-wrap">
       <table className="pos-cart-table">
@@ -35,6 +42,8 @@ export default function Cart({ cart, increaseQuantity, decreaseQuantity, onRemov
                 item={item}
                 increaseQuantity={increaseQuantity}
                 decreaseQuantity={decreaseQuantity}
+                updateQuantity={updateQuantity}
+                commitQuantity={commitQuantity}
                 onRemove={onRemove}
               />
             ))

@@ -2,16 +2,42 @@ import { supabase } from "../config/supabaseClient.js"
 
 export const getProducts = async (req, res) => {
 
-    console.log("USER TOKEN:", req.user)
+  try {
 
-    const { data, error } = await supabase
-        .from("products")
-        .select("*, categories(name)")
-        .eq("business_id", req.user.business_id)
+    const business_id = req.user.business_id
 
-    if (error) return res.status(500).json(error)
+    // 🔥 params
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 12
 
-    res.json(data)
+    const from = (page - 1) * limit
+    const to = from + limit - 1
+
+    const { data, error, count } = await supabase
+      .from("products")
+      .select("*, categories(name)", { count: "exact" })
+      .eq("business_id", business_id)
+      .range(from, to)
+
+    if (error) throw error
+
+    res.json({
+      data,
+      total: count,
+      page,
+      totalPages: Math.ceil(count / limit)
+    })
+
+  } catch (error) {
+
+    console.error("ERROR PRODUCTS:", error)
+
+    res.status(500).json({
+      error: "Error obteniendo productos"
+    })
+
+  }
+
 }
 
 

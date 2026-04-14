@@ -207,6 +207,33 @@
   transition: background 0.25s, border-color 0.25s;
 }
 
+.pos-cart-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  margin-top: -1px;
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  background: var(--bg-card);
+  transition: background 0.25s, border-color 0.25s;
+}
+
+.pos-cart-total-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.pos-cart-total-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
 .pos-cart-table {
   width: 100%;
   border-collapse: collapse;

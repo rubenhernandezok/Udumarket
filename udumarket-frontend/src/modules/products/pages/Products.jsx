@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react"
-
 import Layout from "../../../components/layout/Layout"
-
 import ProductForm from "../components/ProductForm"
 import ProductTable from "../components/ProductTable"
+import "../../shared/uduPage.css"
 
 import {
   getProducts,
@@ -13,7 +12,6 @@ import {
 } from "../services/productService"
 
 import { getCategories } from "../../categories/services/categoryService"
-
 
 export default function Products() {
 
@@ -26,91 +24,115 @@ export default function Products() {
   const [showForm, setShowForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState(null)
 
+  // 🔥 PAGINACIÓN
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 12
 
   const loadProducts = async () => {
+    try {
+      const res = await getProducts()
 
-    const data = await getProducts()
+      // 🔥 FIX CLAVE: asegurar array siempre
+      setProducts(Array.isArray(res?.data) ? res.data : [])
 
-    setProducts(data || [])
-
+    } catch (error) {
+      console.error("Error cargando productos:", error)
+      setProducts([])
+    }
   }
 
   const loadCategories = async () => {
-
-    const data = await getCategories()
-
-    setCategories(data || [])
-
+    try {
+      const data = await getCategories()
+      setCategories(Array.isArray(data) ? data : [])
+    } catch (error) {
+      console.error("Error cargando categorías:", error)
+      setCategories([])
+    }
   }
 
   useEffect(() => {
-
     loadProducts()
     loadCategories()
-
   }, [])
 
+  // 🔥 RESET PAGINA cuando cambia filtro
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [search, categoryFilter])
 
   const handleSave = async (product) => {
 
-    if (editingProduct) {
+    try {
 
-      await updateProduct(editingProduct.id, product)
+      if (editingProduct) {
+        await updateProduct(editingProduct.id, product)
+      } else {
+        await createProduct(product)
+      }
 
-    } else {
+      await loadProducts()
 
-      await createProduct(product)
+      setEditingProduct(null)
+      setShowForm(false)
+      setCurrentPage(1)
 
+    } catch (error) {
+      console.error("Error guardando producto:", error)
     }
-
-    await loadProducts()
-
-    setEditingProduct(null)
-
-    setShowForm(false)
-
   }
-
 
   const handleDelete = async (id) => {
-
-    await deleteProduct(id)
-
-    loadProducts()
-
+    try {
+      await deleteProduct(id)
+      await loadProducts()
+      setCurrentPage(1)
+    } catch (error) {
+      console.error("Error eliminando producto:", error)
+    }
   }
-
 
   const handleEdit = (product) => {
-
     setEditingProduct(product)
     setShowForm(true)
-
   }
 
-
-  // FILTRO BUSCADOR + CATEGORIA
-
-  const filteredProducts = products.filter((p) => {
+  // 🔎 FILTRO SEGURO
+  const filteredProducts = (products || []).filter((p) => {
 
     const matchesSearch =
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.name?.toLowerCase().includes(search.toLowerCase()) ||
       p.barcode?.includes(search)
+
+    const isLowStock = p.stock_min && p.stock <= p.stock_min
 
     const matchesCategory =
       categoryFilter === "" ||
-      String(p.category_id) === String(categoryFilter)
+      categoryFilter === "low-stock" ||
+      String(p.category_id) === String(categoryFilter) ||
+      String(p.categories?.id) === String(categoryFilter)
 
-    return matchesSearch && matchesCategory
+    const matchesLowStock =
+      categoryFilter !== "low-stock" || isLowStock
 
+    return matchesSearch && matchesCategory && matchesLowStock
   })
 
+  // 🔥 PAGINACIÓN
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / itemsPerPage))
+
+  const startIndex = (currentPage - 1) * itemsPerPage
+
+  const paginatedProducts = filteredProducts.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  )
 
   return (
 
     <Layout>
 
-      <div className="container mt-4">
+      <div className="container mt-4 udu-page">
 
         <div className="d-flex justify-content-between align-items-center mb-3">
 
@@ -128,9 +150,7 @@ export default function Products() {
 
         </div>
 
-
         {/* BUSCADOR + FILTRO */}
-
         <div className="row mb-3">
 
           <div className="col-md-8">
@@ -154,13 +174,14 @@ export default function Products() {
             >
 
               <option value="">Todas las categorías</option>
+              <option value="low-stock" style={{ color: "var(--danger)" }}>
+                Bajo stock
+              </option>
 
               {categories.map((cat) => (
-
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
                 </option>
-
               ))}
 
             </select>
@@ -169,16 +190,39 @@ export default function Products() {
 
         </div>
 
-
+        {/* TABLA */}
         <ProductTable
-          products={filteredProducts}
+          products={paginatedProducts}
           onDelete={handleDelete}
           onEdit={handleEdit}
         />
 
+        {/* 🔢 PAGINACIÓN (ALINEADA) */}
+        <div className="d-flex justify-content-center align-items-center gap-3 mt-3 flex-wrap">
+
+          <button
+            className="btn btn-outline-primary"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(prev => prev - 1)}
+          >
+            ← Anterior
+          </button>
+
+          <span className="fw-semibold">
+            Página {currentPage} de {totalPages}
+          </span>
+
+          <button
+            className="btn btn-outline-primary"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(prev => prev + 1)}
+          >
+            Siguiente →
+          </button>
+
+        </div>
 
         {/* MODAL */}
-
         {showForm && (
 
           <div
@@ -194,11 +238,9 @@ export default function Products() {
                 <div className="modal-header">
 
                   <h5 className="modal-title">
-
                     {editingProduct
                       ? `Editar producto: ${editingProduct.name}`
                       : "Nuevo producto"}
-
                   </h5>
 
                   <button
@@ -230,5 +272,4 @@ export default function Products() {
     </Layout>
 
   )
-
 }
