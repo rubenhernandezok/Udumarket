@@ -394,6 +394,7 @@
   border-radius: 0 0 12px 12px;
   overflow: hidden;
   transition: background 0.25s, border-color 0.25s;
+  position: relative;
 }
 
 .pos-payment-footer {
@@ -595,6 +596,76 @@
 .pos-btn-accept:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+/* ——— Modal éxito ——— */
+.pos-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+}
+
+.pos-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 22px;
+  min-width: 280px;
+  max-width: 360px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  color: var(--text-primary);
+  animation: pos-fade-in 0.15s ease;
+}
+
+.pos-modal h4 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+
+.pos-modal p {
+  margin: 0 0 14px;
+  color: var(--text-secondary);
+  font-size: 13.5px;
+}
+
+/* ——— Toast error ——— */
+.pos-toast {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--danger);
+  padding: 10px 12px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow);
+  color: var(--text-primary);
+  z-index: 350;
+}
+
+.pos-toast-error {
+  border-left-color: var(--danger);
+}
+
+.pos-toast-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.pos-toast-close:hover {
+  color: var(--text-primary);
 }
 
 /* ── Badge de estado (stock) ── */

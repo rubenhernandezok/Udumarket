@@ -16,6 +16,7 @@ export default function POS() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [stockError, setStockError] = useState("");
 
   const roundQuantity = (num, unitType) => {
     if (unitType === "kg") {
@@ -32,6 +33,26 @@ export default function POS() {
     }
     return String(Math.round(num));
   };
+
+  const getProductById = (id) => {
+    return allProducts.find((product) => product.id === id);
+  };
+
+  const getStockForProduct = (id) => {
+    const product = getProductById(id);
+    const stock = Number(product?.stock);
+    return {
+      stock: Number.isFinite(stock) ? stock : null,
+      unitType: product?.unit_type || "unit",
+      name: product?.name || "el producto"
+    };
+  };
+
+  useEffect(() => {
+    if (!stockError) return;
+    const timer = setTimeout(() => setStockError(""), 3000);
+    return () => clearTimeout(timer);
+  }, [stockError]);
 
   const parseQuantityForItem = (item, rawValue) => {
     if (rawValue === "") return "";
@@ -111,20 +132,30 @@ export default function POS() {
 
       const currentQty = existing ? Number(existing.quantity) || 0 : 0;
       const available = Number(product.stock || 0) - currentQty;
-      if (available <= 0) return prev;
+      if (available <= 0) {
+        const unitLabel = product.unit_type === "kg" ? "kg" : product.unit_type === "liter" ? "l" : "unid";
+        setStockError(`Stock insuficiente para ${product.name}. Disponible: ${available <= 0 ? 0 : available} ${unitLabel}`);
+        return prev;
+      }
 
       if (existing) {
         return prev.map((item) =>
           item.product_id === product.id
             ? (() => {
                 const nextQty = roundQuantity((Number(item.quantity) || 0) + 1, item.unit_type);
+                const stockInfo = getStockForProduct(item.product_id);
+                if (stockInfo.stock !== null && nextQty > stockInfo.stock) {
+                  const unitLabel = stockInfo.unitType === "kg" ? "kg" : stockInfo.unitType === "liter" ? "l" : "unid";
+                  setStockError(`Stock insuficiente para ${item.name}. Disponible: ${stockInfo.stock} ${unitLabel}`);
+                  return item;
+                }
                 return {
-              ...item,
-              quantity: nextQty,
-              quantity_input: formatQuantityForInput(nextQty, item.unit_type),
-              subtotal: nextQty * item.price,
-            };
-          })()
+                  ...item,
+                  quantity: nextQty,
+                  quantity_input: formatQuantityForInput(nextQty, item.unit_type),
+                  subtotal: nextQty * item.price,
+                };
+              })()
             : item
         );
       }
@@ -155,6 +186,12 @@ export default function POS() {
         item.product_id === id ? (() => {
           const step = item.unit_type === "kg" ? 0.1 : 1;
           const nextQty = roundQuantity((Number(item.quantity) || 0) + step, item.unit_type);
+          const stockInfo = getStockForProduct(item.product_id);
+          if (stockInfo.stock !== null && nextQty > stockInfo.stock) {
+            const unitLabel = stockInfo.unitType === "kg" ? "kg" : stockInfo.unitType === "liter" ? "l" : "unid";
+            setStockError(`Stock insuficiente para ${item.name}. Disponible: ${stockInfo.stock} ${unitLabel}`);
+            return item;
+          }
           return {
             ...item,
             quantity: nextQty,
@@ -231,6 +268,22 @@ export default function POS() {
         );
       }
 
+      const stockInfo = getStockForProduct(targetItem.product_id);
+      if (stockInfo.stock !== null && parsed > stockInfo.stock) {
+        const unitLabel = stockInfo.unitType === "kg" ? "kg" : stockInfo.unitType === "liter" ? "l" : "unid";
+        setStockError(`Stock insuficiente para ${targetItem.name}. Disponible: ${stockInfo.stock} ${unitLabel}`);
+        return prev.map((item) =>
+          item.product_id === id
+            ? {
+              ...item,
+              quantity: stockInfo.stock,
+              quantity_input: formatQuantityForInput(stockInfo.stock, item.unit_type),
+              subtotal: stockInfo.stock * item.price,
+            }
+            : item
+        );
+      }
+
       return prev.map((item) =>
         item.product_id === id
           ? {
@@ -270,6 +323,18 @@ export default function POS() {
     <Layout>
 
       <div className="pos-page">
+        {stockError && (
+          <div className="pos-toast pos-toast-error" role="alert">
+            <span>{stockError}</span>
+            <button
+              className="pos-toast-close"
+              onClick={() => setStockError("")}
+              aria-label="Cerrar"
+            >
+              ×
+            </button>
+          </div>
+        )}
 
         {/* IZQUIERDA */}
         <div className="pos-left">
@@ -318,6 +383,7 @@ export default function POS() {
             cart={cart}
             total={total}
             setCart={setCart}
+            products={allProducts}
             clearCart={() => {
               clearCart();
               reloadProducts(); // 🔥 importante

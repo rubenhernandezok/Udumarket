@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createSale } from "../services/saleService";
 
 
@@ -10,13 +10,36 @@ PaymentPanel
 No existe pantalla adicional.
 */
 
-export default function PaymentPanel({ cart, total, setCart, clearCart }) {
+export default function PaymentPanel({ cart, total, setCart, clearCart, products }) {
   const [method, setMethod] = useState(null); // null | "cash" | "transfer"
   const [received, setReceived] = useState("");
   const [loading, setLoading] = useState(false);
+  const [successOpen, setSuccessOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const change =
     received !== "" ? parseFloat(received) - total : null;
+
+  useEffect(() => {
+    if (!errorMessage) return;
+    const timer = setTimeout(() => setErrorMessage(""), 3000);
+    return () => clearTimeout(timer);
+  }, [errorMessage]);
+
+  const getProductById = (id) => {
+    return (products || []).find((product) => product.id === id);
+  };
+
+  const formatUnitLabel = (unitType) => {
+    switch (unitType) {
+      case "kg":
+        return "kg";
+      case "liter":
+        return "l";
+      default:
+        return "unid";
+    }
+  };
 
   const handleSelectMethod = (m) => {
     if (m === "transfer") {
@@ -29,14 +52,31 @@ export default function PaymentPanel({ cart, total, setCart, clearCart }) {
 
   const handlePayment = async (m) => {
     if (cart.length === 0) {
-      alert("No hay productos en la venta");
+      setErrorMessage("No hay productos en la venta");
+      return;
+    }
+
+    const stockIssue = cart.find((item) => {
+      const product = getProductById(item.product_id);
+      const stock = Number(product?.stock);
+      if (!Number.isFinite(stock)) return false;
+      return Number(item.quantity) > stock;
+    });
+
+    if (stockIssue) {
+      const product = getProductById(stockIssue.product_id);
+      const stock = Number(product?.stock);
+      const unitLabel = formatUnitLabel(product?.unit_type);
+      setErrorMessage(
+        `Stock insuficiente para ${product?.name || "el producto"}. Disponible: ${stock} ${unitLabel}`
+      );
       return;
     }
 
     if (m === "cash") {
       const recv = parseFloat(received);
       if (isNaN(recv) || recv < total) {
-        alert("El efectivo recibido es insuficiente");
+        setErrorMessage("El efectivo recibido es insuficiente");
         return;
       }
     }
@@ -46,7 +86,7 @@ export default function PaymentPanel({ cart, total, setCart, clearCart }) {
       const response = await createSale(cart, m);
       if (response.sale_id) {
 
-  alert("Venta registrada correctamente");
+  setSuccessOpen(true);
 
   setCart([]);
 
@@ -59,11 +99,11 @@ export default function PaymentPanel({ cart, total, setCart, clearCart }) {
   }
 
       } else {
-        alert(response.error || "Error al registrar venta");
+        setErrorMessage(response.error || "Error al registrar venta");
       }
     } catch (error) {
       console.error(error);
-      alert("Error de conexión");
+      setErrorMessage("Error de conexión");
     } finally {
       setLoading(false);
     }
@@ -71,6 +111,35 @@ export default function PaymentPanel({ cart, total, setCart, clearCart }) {
 
   return (
     <div className="pos-payment">
+      {/* Toast de error */}
+      {errorMessage && (
+        <div className="pos-toast pos-toast-error" role="alert">
+          <span>{errorMessage}</span>
+          <button
+            className="pos-toast-close"
+            onClick={() => setErrorMessage("")}
+            aria-label="Cerrar"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {/* Modal de éxito */}
+      {successOpen && (
+        <div className="pos-modal-backdrop">
+          <div className="pos-modal" role="dialog" aria-modal="true">
+            <h4>Venta registrada correctamente</h4>
+            <p>La venta se guardó con éxito.</p>
+            <button
+              className="pos-btn-accept"
+              onClick={() => setSuccessOpen(false)}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
       {/* ── Botones de método de pago ── */}
       <div className="pos-payment-footer">
         <button
